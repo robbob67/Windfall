@@ -7,9 +7,10 @@
 // ******************************************************************************
 
 class CardSlot {
+    #meshes;
     static BLANK_CARD_TEXTURE = new THREE.TextureLoader().load( 'textures/treant.png' );
     constructor() {
-
+        this.#meshes = [];
     }
     addToThreeJSScene(threeJSScene, xPosition, yPosition, zPosition, tiltInRadians, width, height) {
         const size = Math.min(width, height);
@@ -17,9 +18,54 @@ class CardSlot {
         const material = new THREE.MeshBasicMaterial( { map: CardSlot.BLANK_CARD_TEXTURE } );
         //var material = new THREE.MeshStandardMaterial( { color: 0x00ff00, flatShading: true, metalness: 0, roughness: 1 });
         const cardPlane = new THREE.Mesh( geometry, material );
+        this.#meshes.push(cardPlane);
         geometry.translate( xPosition - ((width - size)/2), yPosition - ((height - size)/2), zPosition );
         cardPlane.rotation.x = tiltInRadians;
         threeJSScene.add( cardPlane );
+    }
+    meshIsOwnedByCardSlot(mesh) {
+        for (let i = 0; i < this.#meshes.length; i++) {
+            if (this.#meshes[i] == mesh) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+class ActionHandler {
+    #cardSlotsToHandle;
+    #onCardSlotWasMousedOver;
+    #onCardSlotWasClicked;
+    #mostRecentMouseOverCardSlot;
+    constructor(cardSlotsToHandle, onCardSlotWasMousedOver, onCardSlotWasClicked) {
+        this.#cardSlotsToHandle = cardSlotsToHandle;
+        this.#onCardSlotWasClicked = onCardSlotWasClicked;
+        this.#onCardSlotWasMousedOver = onCardSlotWasMousedOver;
+        this.#mostRecentMouseOverCardSlot = null;
+    }
+    #cardSlotWasClicked(cardSlot) {
+        this.#onCardSlotWasClicked(cardSlot);
+    }
+    #cardSlotWasMousedOver(cardSlot) {
+        this.#onCardSlotWasMousedOver(cardSlot);
+    }
+    mouseClickOccured() {
+        if (this.#mostRecentMouseOverCardSlot != null) {
+            this.#cardSlotWasClicked(this.#mostRecentMouseOverCardSlot);
+        }
+    }
+    clearMouseOverHistory() {
+        this.#mostRecentMouseOverCardSlot = null;
+    }
+    meshWasMousedOver(mesh) {
+        for (let i = 0; i < this.#cardSlotsToHandle.length; i++) {
+            let cardSlot = this.#cardSlotsToHandle[i];
+            if (cardSlot.meshIsOwnedByCardSlot(mesh)) {
+                this.#mostRecentMouseOverCardSlot = cardSlot;
+                this.#cardSlotWasMousedOver(cardSlot);
+            }
+        }
     }
 }
 
@@ -67,7 +113,13 @@ class Table {
         const yPosition = (cardSlotRowIndex*cardHeight) + tableEdgePadding - (Table.tableHeight / 2) + (cardHeight / 2);
         cardSlot.addToThreeJSScene(threeJSScene, xPosition, yPosition, (Table.tableDepth/2)+0.001, Table.tableTiltRadians, cardWidth, cardHeight);
     }
+    actionHandler() {
+        return new ActionHandler(this.#cardSlots, (cardSlotMousedOver) => {
 
+        }, (cardSlotWasClicked) => {
+
+        });
+    }
 }
 
 class Hand {
@@ -90,18 +142,30 @@ class Hand {
             cardSlot.addToThreeJSScene(threeJSScene, xPositionOfCard, yPositionOfCards, 0, 0, cardSize, cardSize);
         }
     }
+    actionHandler() {
+        return new ActionHandler(this.#cardSlots, (cardSlotMousedOver) => {
+            console.log('handler mouse over');
+        }, (cardSlotWasClicked) => {
+            console.log('handler lciked');
+        });
+    }
 }
+
+
 
 class GameScene {
     #threeJSScene;
     #threeJScamera;
     #threeJSRenderer;
+    #actionHandlers;
     constructor() {
         this.#threeJSScene = new THREE.Scene();
         this.#threeJScamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.#threeJSRenderer = new THREE.WebGLRenderer({ antialias: true});
+        this.#actionHandlers = [];
         this.#addSceneToWindow();
         this.#addLightToScene();
+        this.#startListeningToMouseEvents();
     }
 
     #addSceneToWindow() {
@@ -131,10 +195,12 @@ class GameScene {
 
     addTable(table) {
         table.addToThreeJSScene(this.#threeJSScene);
+        this.#actionHandlers.push(table.actionHandler());
     }
 
     addHand(hand) {
         hand.addToThreeJSScene(this.#threeJSScene);
+        this.#actionHandlers.push(hand.actionHandler());
     }
 
     startRendering() {
@@ -143,6 +209,32 @@ class GameScene {
         } );
         this.#threeJSRenderer.render( this.#threeJSScene, this.#threeJScamera );
     }
+
+    
+    #startListeningToMouseEvents() {
+        window.addEventListener( 'mousemove', (event) => {
+            for (const actionHandler of this.#actionHandlers) {
+                actionHandler.clearMouseOverHistory();
+            }
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            raycaster.setFromCamera( mouse, this.#threeJScamera );
+            const intersects = raycaster.intersectObjects( this.#threeJSScene.children );
+            for ( let i = 0; i < intersects.length; i ++ ) {
+                for (const actionHandler of this.#actionHandlers) {
+                    actionHandler.meshWasMousedOver(intersects[i].object);
+                }
+            }
+        }, false );
+        window.addEventListener( 'mousedown', (event) => {
+            for (const actionHandler of this.#actionHandlers) {
+                actionHandler.mouseClickOccured();
+            }
+        }, false );
+    }
+
 }
 
 class CardSpace {
