@@ -38,10 +38,12 @@ class ActionHandler {
     #onCardSlotWasMousedOver;
     #onCardSlotWasClicked;
     #mostRecentMouseOverCardSlot;
-    constructor(cardSlotsToHandle, onCardSlotWasMousedOver, onCardSlotWasClicked) {
+    #onCardSlotWasMousedleaved;
+    constructor(cardSlotsToHandle, onCardSlotWasMousedOver, onCardSlotWasMousedleaved, onCardSlotWasClicked) {
         this.#cardSlotsToHandle = cardSlotsToHandle;
         this.#onCardSlotWasClicked = onCardSlotWasClicked;
         this.#onCardSlotWasMousedOver = onCardSlotWasMousedOver;
+        this.#onCardSlotWasMousedleaved = onCardSlotWasMousedleaved;
         this.#mostRecentMouseOverCardSlot = null;
     }
     #cardSlotWasClicked(cardSlot) {
@@ -50,12 +52,16 @@ class ActionHandler {
     #cardSlotWasMousedOver(cardSlot) {
         this.#onCardSlotWasMousedOver(cardSlot);
     }
+    #cardSlotWasMouseLeaved(cardSlot) {
+        this.#onCardSlotWasMousedleaved(cardSlot);
+    }
     mouseClickOccured() {
         if (this.#mostRecentMouseOverCardSlot != null) {
             this.#cardSlotWasClicked(this.#mostRecentMouseOverCardSlot);
         }
     }
     clearMouseOverHistory() {
+        //if ()
         this.#mostRecentMouseOverCardSlot = null;
     }
     meshWasMousedOver(mesh) {
@@ -64,6 +70,14 @@ class ActionHandler {
             if (cardSlot.meshIsOwnedByCardSlot(mesh)) {
                 this.#mostRecentMouseOverCardSlot = cardSlot;
                 this.#cardSlotWasMousedOver(cardSlot);
+            }
+        }
+    }
+    meshWasMouseLeaved(mesh) {
+        for (let i = 0; i < this.#cardSlotsToHandle.length; i++) {
+            let cardSlot = this.#cardSlotsToHandle[i];
+            if (cardSlot.meshIsOwnedByCardSlot(mesh)) {
+                this.#cardSlotWasMouseLeaved(cardSlot);
             }
         }
     }
@@ -114,10 +128,15 @@ class Table {
         cardSlot.addToThreeJSScene(threeJSScene, xPosition, yPosition, (Table.tableDepth/2)+0.001, Table.tableTiltRadians, cardWidth, cardHeight);
     }
     actionHandler() {
-        return new ActionHandler(this.#cardSlots, (cardSlotMousedOver) => {
-
+        return new ActionHandler(this.#cardSlots, 
+            (cardSlotMousedOver) => {
+            console.log('handler mouse over');
+            // Raise the card
+        }, (cardSlotMouseLeaved) => {
+            console.log('handler mouse leaved');
+            // Raise the card
         }, (cardSlotWasClicked) => {
-
+            console.log('handler clicked');
         });
     }
 }
@@ -143,10 +162,15 @@ class Hand {
         }
     }
     actionHandler() {
-        return new ActionHandler(this.#cardSlots, (cardSlotMousedOver) => {
+        return new ActionHandler(this.#cardSlots, 
+            (cardSlotMousedOver) => {
             console.log('handler mouse over');
+            // Raise the card
+        }, (cardSlotMouseLeaved) => {
+            console.log('handler mouse leaved');
+            // Raise the card
         }, (cardSlotWasClicked) => {
-            console.log('handler lciked');
+            console.log('handler clicked');
         });
     }
 }
@@ -158,11 +182,13 @@ class GameScene {
     #threeJScamera;
     #threeJSRenderer;
     #actionHandlers;
+    #previousMouseOverList;
     constructor() {
         this.#threeJSScene = new THREE.Scene();
         this.#threeJScamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.#threeJSRenderer = new THREE.WebGLRenderer({ antialias: true});
         this.#actionHandlers = [];
+        this.#previousMouseOverList = [];
         this.#addSceneToWindow();
         this.#addLightToScene();
         this.#startListeningToMouseEvents();
@@ -222,11 +248,31 @@ class GameScene {
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
             raycaster.setFromCamera( mouse, this.#threeJScamera );
             const intersects = raycaster.intersectObjects( this.#threeJSScene.children );
+            
+            // Mouse leave events
+            for (const previousMouseOverObject of this.#previousMouseOverList) {
+                let found = false;
+                for ( let i = 0; i < intersects.length; i ++ ) {
+                    if(intersects[i].object == previousMouseOverObject.object) {
+                        found = true;
+                    }
+                }
+                if(!found) {
+                    for (const actionHandler of this.#actionHandlers) {
+                        actionHandler.meshWasMouseLeaved(previousMouseOverObject.object);
+                    }
+                }
+            }
+            
+            // Mouse enter events
             for ( let i = 0; i < intersects.length; i ++ ) {
                 for (const actionHandler of this.#actionHandlers) {
                     actionHandler.meshWasMousedOver(intersects[i].object);
                 }
             }
+
+            // Set new previous
+            this.#previousMouseOverList = intersects;
         }, false );
         window.addEventListener( 'mousedown', (event) => {
             for (const actionHandler of this.#actionHandlers) {
