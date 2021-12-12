@@ -188,8 +188,10 @@ class Table {
 
 class Hand {
     #cardSlots;
+    #selectedCard;
     constructor(numberOfCardSlotsInHand) {
         this.#cardSlots = [];
+        this.#selectedCard = null;
         for (let cardSlotIndex = 0; cardSlotIndex < numberOfCardSlotsInHand; cardSlotIndex++) {
             this.#cardSlots.push(new CardSlot());
         }
@@ -216,15 +218,17 @@ class Hand {
             console.log('handler mouse leaved');
             // lower the card
             cardSlotMouseLeaved.setCardFocus(false);
-            if(cardSlotMouseLeaved.cardIsSelected()) {
-                cardSlotMouseLeaved.setCardSelected(false);
-            }
         }, (cardSlotWasClicked) => {
             console.log('handler clicked');
             if(cardSlotWasClicked.cardIsSelected()) {
                 cardSlotWasClicked.setCardSelected(false);
+                this.#selectedCard = null;
             } else {
                 cardSlotWasClicked.setCardSelected(true);
+                if (this.#selectedCard != null) {
+                    this.#selectedCard.setCardSelected(false);
+                }
+                this.#selectedCard = cardSlotWasClicked;
             }
         });
     }
