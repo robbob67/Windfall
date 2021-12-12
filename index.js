@@ -8,8 +8,12 @@
 
 class CardSlot {
     #meshes;
+    #cardIsFocused;
+    #cardIsSelected;
     static BLANK_CARD_TEXTURE = new THREE.TextureLoader().load( 'textures/treant.png' );
     constructor() {
+        this.#cardIsFocused = false;
+        this.#cardIsSelected = false;
         this.#meshes = [];
     }
     addToThreeJSScene(threeJSScene, xPosition, yPosition, zPosition, tiltInRadians, width, height) {
@@ -23,6 +27,11 @@ class CardSlot {
         cardPlane.rotation.x = tiltInRadians;
         threeJSScene.add( cardPlane );
     }
+    #doMeshAction(meshAction) {
+        for (let i = 0; i < this.#meshes.length; i++) {
+            meshAction(this.#meshes[i]);
+        }
+    }
     meshIsOwnedByCardSlot(mesh) {
         for (let i = 0; i < this.#meshes.length; i++) {
             if (this.#meshes[i] == mesh) {
@@ -30,6 +39,40 @@ class CardSlot {
             }
         }
         return false;
+    }
+    setCardFocus(isFocused) {
+        if (this.#cardIsFocused != isFocused) {
+            this.#cardIsFocused = isFocused;
+            if (isFocused) {
+                this.#doMeshAction((mesh) => {
+                    mesh.position.z += 0.3;
+                    mesh.position.y += 0.17;
+                });
+            } else {
+                this.#doMeshAction((mesh) => {
+                    mesh.position.z -= 0.3;
+                    mesh.position.y -= 0.17;
+                });
+            }
+        }
+    }
+    cardIsSelected() {
+        return this.#cardIsSelected;
+    }
+    setCardSelected(isSelected) {
+        if (this.#cardIsSelected != isSelected) {
+            this.#cardIsSelected = isSelected;
+            if (isSelected) {
+                this.#doMeshAction((mesh) => {
+                    //mesh.material = new THREE.MeshStandardMaterial( { color: 0x00ff00, flatShading: true, metalness: 0, roughness: 1 });
+                    mesh.material = new THREE.MeshBasicMaterial( { color: 0xffffff00 , map: CardSlot.BLANK_CARD_TEXTURE } );
+                });
+            } else {
+                this.#doMeshAction((mesh) => {
+                    mesh.material = new THREE.MeshBasicMaterial( { map: CardSlot.BLANK_CARD_TEXTURE } );
+                });
+            }
+        }
     }
 }
 
@@ -132,9 +175,11 @@ class Table {
             (cardSlotMousedOver) => {
             console.log('handler mouse over');
             // Raise the card
+            //cardSlotMousedOver.setCardFocus(true);
         }, (cardSlotMouseLeaved) => {
             console.log('handler mouse leaved');
             // Raise the card
+            //cardSlotMouseLeaved.setCardFocus(false);
         }, (cardSlotWasClicked) => {
             console.log('handler clicked');
         });
@@ -165,12 +210,22 @@ class Hand {
         return new ActionHandler(this.#cardSlots, 
             (cardSlotMousedOver) => {
             console.log('handler mouse over');
+            cardSlotMousedOver.setCardFocus(true);
             // Raise the card
         }, (cardSlotMouseLeaved) => {
             console.log('handler mouse leaved');
-            // Raise the card
+            // lower the card
+            cardSlotMouseLeaved.setCardFocus(false);
+            if(cardSlotMouseLeaved.cardIsSelected()) {
+                cardSlotMouseLeaved.setCardSelected(false);
+            }
         }, (cardSlotWasClicked) => {
             console.log('handler clicked');
+            if(cardSlotWasClicked.cardIsSelected()) {
+                cardSlotWasClicked.setCardSelected(false);
+            } else {
+                cardSlotWasClicked.setCardSelected(true);
+            }
         });
     }
 }
