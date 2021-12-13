@@ -1,6 +1,6 @@
 // ******************************************************************************
 // 
-// Project Windfall: action_handler.js
+// Project Windfall: GameScene.js
 //
 // Copyright© 2021
 //
@@ -123,11 +123,9 @@ export class GameScene {
     }
 
     #addLightToScene() {
-        // ambient light
         const ambientLight = new THREE.AmbientLight ( 0xffffff, 0.2);
         this.#threeJSScene.add( ambientLight );
  
-        // point light
         const pointLight = new THREE.PointLight( 0xffffff, 1 );
         pointLight.position.set( 25, 50, 25 );
         this.#threeJSScene.add( pointLight ); 

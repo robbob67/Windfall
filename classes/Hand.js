@@ -1,6 +1,6 @@
 // ******************************************************************************
 // 
-// Project Windfall: action_handler.js
+// Project Windfall: Hand.js
 //
 // Copyright© 2021
 //

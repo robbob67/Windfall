@@ -1,6 +1,6 @@
 // ******************************************************************************
 // 
-// Project Windfall: index.js
+// Project Windfall: main.js
 //
 // Copyright © 2021
 //
@@ -11,16 +11,11 @@ import { GameScene } from './classes/GameScene.js';
 
 class CardSpace {
     constructor() {
-      //this.height = height;
-      //this.width = width;
     }
 }
 
-//
 class Board {
-    constructor(height, width) {
-      this.height = height;
-      this.width = width;
+    constructor() {
     }
 }
 
