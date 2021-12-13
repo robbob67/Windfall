@@ -34,7 +34,20 @@ scene.add( cube )
 //const texture = new THREE.TextureLoader().load( 'textures/treant.png' );
 //const material = new THREE.MeshBasicMaterial( { map: texture } );
 //const plane = new THREE.Mesh( geometry, material );
+//scene.add( plane )
+
+//
+
+// Plane
+//const geometry = new THREE.PlaneGeometry( 1, 1 );
+//const texture = new THREE.TextureLoader().load( 'textures/treant.png' );
+//const material = new THREE.MeshBasicMaterial( { map: texture } );
+//const plane = new THREE.Mesh( geometry, material );
 //scene.add( plane );
+ 
+
+
+;
  
 // ambient light
 var ambientLight = new THREE.AmbientLight ( 0xffffff, 0.2)

@@ -5,7 +5,6 @@
 // Copyright© 2021
 //
 // ******************************************************************************
-
 import { CardSlot } from './CardSlot.js';
 import { CardSlotActionHandler } from './CardSlotActionHandler.js';
 

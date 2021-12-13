@@ -5,7 +5,6 @@
 // Copyright© 2021
 //
 // ******************************************************************************
-
 export class GameScene {
 
     // ------------------------------------------------------------------------------
@@ -52,19 +51,27 @@ export class GameScene {
 
     #startListeningToMouseEvents() {
         window.addEventListener( 'mousemove', (event) => {
-            for (const cardSlotActionHandler of this.#cardSlotActionHandlers) {
-                cardSlotActionHandler.clearEventHistory();
-            }
-            let mouseOverList = this.#getMouseOverList(event);
-            this.#processMouseLeaveEvents(mouseOverList);
-            this.#processMouseEnterEvents(mouseOverList);
-            this.#previousMouseOverList = mouseOverList;
+            this.#onMouseMove(event);
         }, false );
         window.addEventListener( 'mousedown', (event) => {
-            for (const cardSlotActionHandler of this.#cardSlotActionHandlers) {
-                cardSlotActionHandler.notifyMouseClick();
-            }
+            this.#onMouseDown(event);
         }, false );
+    }
+
+    #onMouseMove(event) {
+        for (const cardSlotActionHandler of this.#cardSlotActionHandlers) {
+            cardSlotActionHandler.clearEventHistory();
+        }
+        let mouseOverList = this.#getMouseOverList(event);
+        this.#processMouseLeaveEvents(mouseOverList);
+        this.#processMouseEnterEvents(mouseOverList);
+        this.#previousMouseOverList = mouseOverList;
+    }
+
+    #onMouseDown(event) {
+        for (const cardSlotActionHandler of this.#cardSlotActionHandlers) {
+            cardSlotActionHandler.notifyMouseClick();
+        }
     }
 
     #getMouseOverList(event) {
