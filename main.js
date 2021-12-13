@@ -23,9 +23,12 @@ class Board {
 // MAIN
 // ------------------------------------------------------------------------------
 function main() {
+    const numberOfTableCards = 100;
+    const numberOfHandCards = 5;
+
     const gameScene = new GameScene();
-    const table = new Table(100);
-    const hand = new Hand(5);
+    const table = new Table(numberOfTableCards);
+    const hand = new Hand(numberOfHandCards);
     
     gameScene.startRendering();
     gameScene.addTable(table);
