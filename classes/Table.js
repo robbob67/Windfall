@@ -27,9 +27,9 @@ export class Table {
     }
     
     addToThreeJSScene(threeJSScene) {
-        var geometry = new THREE.BoxGeometry( Table.tableWidth, Table.tableHeight, Table.tableDepth);
-        var material = new THREE.MeshStandardMaterial( { color: 0xff0051, flatShading: true, metalness: 0, roughness: 1 });
-        var tableBox = new THREE.Mesh ( geometry, material );
+        const geometry = new THREE.BoxGeometry( Table.tableWidth, Table.tableHeight, Table.tableDepth);
+        const material = new THREE.MeshStandardMaterial( { color: 0xff0051, flatShading: true, metalness: 0, roughness: 1 });
+        const tableBox = new THREE.Mesh ( geometry, material );
         tableBox.rotation.x = Table.tableTiltRadians;
         threeJSScene.add( tableBox );
         this.#addCardSlotsToThreeJSScene(threeJSScene);
@@ -53,15 +53,15 @@ export class Table {
     #cardSlots;
 
     #addCardSlotsToThreeJSScene(threeJSScene) {
-        let numberOfCardSlots = this.#cardSlots.length;
-        var cardSlotColumns = Math.round(Math.sqrt(numberOfCardSlots));
-        var cardSlotRows = cardSlotColumns;
+        const numberOfCardSlots = this.#cardSlots.length;
+        const cardSlotColumns = Math.round(Math.sqrt(numberOfCardSlots));
+        const cardSlotRows = cardSlotColumns;
         
         if (cardSlotColumns*cardSlotColumns != numberOfCardSlots) {
             throw 'Number of card slots must be square.';
         }
         
-        var cardSlotIndex = 0;
+        let cardSlotIndex = 0;
         for (let cardSlotColumnIndex = 0; cardSlotColumnIndex < cardSlotColumns; cardSlotColumnIndex++) {
             for (let cardSlotRowIndex = 0; cardSlotRowIndex < cardSlotRows; cardSlotRowIndex++) {
                 let cardSlot = this.#cardSlots[cardSlotIndex];

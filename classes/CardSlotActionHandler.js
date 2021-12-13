@@ -41,7 +41,7 @@ export class CardSlotActionHandler {
     
     notifyMouseOver(mesh) {
         for (let i = 0; i < this.#cardSlots.length; i++) {
-            let cardSlot = this.#cardSlots[i];
+            const cardSlot = this.#cardSlots[i];
             if (cardSlot.meshIsOwned(mesh)) {
                 this.#lastMouseOverCardSlot = cardSlot;
                 this.#onMouseOver(cardSlot);
@@ -51,7 +51,7 @@ export class CardSlotActionHandler {
     
     notifyMouseLeave(mesh) {
         for (let i = 0; i < this.#cardSlots.length; i++) {
-            let cardSlot = this.#cardSlots[i];
+            const cardSlot = this.#cardSlots[i];
             if (cardSlot.meshIsOwned(mesh)) {
                 this.#onMousedLeave(cardSlot);
             }

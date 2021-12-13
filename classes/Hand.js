@@ -29,8 +29,8 @@ export class Hand {
         const yPositionOfCards = -2.75;
         const leftMostXPositionOfCards = 0 - ((cardSize * numberOfCards) / 2) - ((paddingBetweenCards * (numberOfCards - 1))/2);
         for (let cardSlotIndex = 0; cardSlotIndex < this.#cardSlots.length; cardSlotIndex++) {
-            let cardSlot = this.#cardSlots[cardSlotIndex];
-            let xPositionOfCard = (leftMostXPositionOfCards) + (cardSlotIndex * (cardSize + paddingBetweenCards)) + (cardSize/2);
+            const cardSlot = this.#cardSlots[cardSlotIndex];
+            const xPositionOfCard = (leftMostXPositionOfCards) + (cardSlotIndex * (cardSize + paddingBetweenCards)) + (cardSize/2);
             cardSlot.addToThreeJSScene(threeJSScene, xPositionOfCard, yPositionOfCards, 0, 0, cardSize, cardSize);
         }
     }

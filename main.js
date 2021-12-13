@@ -28,9 +28,9 @@ class Board {
 // MAIN
 // ------------------------------------------------------------------------------
 function main() {
-    var gameScene = new GameScene();
-    var table = new Table(100);
-    var hand = new Hand(5);
+    const gameScene = new GameScene();
+    const table = new Table(100);
+    const hand = new Hand(5);
     
     gameScene.startRendering();
     gameScene.addTable(table);

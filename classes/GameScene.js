@@ -80,7 +80,7 @@ export class GameScene {
         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
         mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
         raycaster.setFromCamera( mouse, this.#threeJScamera );
-        let intersects = raycaster.intersectObjects( this.#threeJSScene.children );
+        const intersects = raycaster.intersectObjects( this.#threeJSScene.children );
         return intersects;
     }
 
@@ -114,8 +114,8 @@ export class GameScene {
         document.body.appendChild( this.#threeJSRenderer.domElement );
         this.#threeJScamera.position.z = 5;
         window.addEventListener( 'resize', () => {
-            let width = window.innerWidth;
-            let height = window.innerHeight;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
             this.#threeJSRenderer.setSize( width, height );
             this.#threeJScamera.aspect = width / height;
             this.#threeJScamera.updateProjectionMatrix();
@@ -124,11 +124,11 @@ export class GameScene {
 
     #addLightToScene() {
         // ambient light
-        var ambientLight = new THREE.AmbientLight ( 0xffffff, 0.2);
+        const ambientLight = new THREE.AmbientLight ( 0xffffff, 0.2);
         this.#threeJSScene.add( ambientLight );
  
         // point light
-        var pointLight = new THREE.PointLight( 0xffffff, 1 );
+        const pointLight = new THREE.PointLight( 0xffffff, 1 );
         pointLight.position.set( 25, 50, 25 );
         this.#threeJSScene.add( pointLight ); 
     }
