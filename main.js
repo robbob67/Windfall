@@ -8,6 +8,8 @@
 import { Table } from './classes/Table.js';
 import { Hand } from './classes/Hand.js';
 import { GameScene } from './classes/GameScene.js';
+import { GameContext } from './classes/GameContext.js';
+import { Card } from './classes/Card.js';
 
 class CardSpace {
     constructor() {
@@ -27,12 +29,23 @@ function main() {
     const numberOfHandCards = 5;
 
     const gameScene = new GameScene();
-    const table = new Table(numberOfTableCards);
-    const hand = new Hand(numberOfHandCards);
-    
     gameScene.startRendering();
-    gameScene.addTable(table);
+
+    const hand = new Hand(numberOfHandCards);
     gameScene.addHand(hand);
+
+    hand.setCardsInHand([new Card(), new Card()]);
+    const gameContext = new GameContext(() => {
+        console.log("hand.aSelectedCardExists()");
+        return hand.aSelectedCardExists();
+    }, () => {
+        console.log("hand.popSelectedCard()");
+        return hand.popSelectedCard();
+    });
+
+    const table = new Table(gameContext, numberOfTableCards);
+    
+    gameScene.addTable(table);
 }
 
 // ------------------------------------------------------------------------------

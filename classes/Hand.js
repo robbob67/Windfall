@@ -16,7 +16,7 @@ export class Hand {
 
     constructor(numberOfCardSlotsInHand) {
         this.#cardSlots = [];
-        this.#selectedCard = null;
+        this.#selectedCardSlot = null;
         for (let cardSlotIndex = 0; cardSlotIndex < numberOfCardSlotsInHand; cardSlotIndex++) {
             this.#cardSlots.push(new CardSlot());
         }
@@ -46,23 +46,44 @@ export class Hand {
         });
     }
 
+    aSelectedCardExists() {
+        return (this.#selectedCardSlot != null && !this.#selectedCardSlot.isEmpty());
+    }
+
+    popSelectedCard() {
+        const selectedCard = this.#selectedCardSlot.card();
+        this.#selectedCardSlot.setCard(null);
+        this.#selectedCardSlot.setCardSelected(false);
+        this.#selectedCardSlot = null;
+        return selectedCard;
+    }
+
+    setCardsInHand(cards) {
+        if (cards.length > this.#cardSlots.length) {
+            throw "setCardsInHand was more cards then the size of hand";
+        }
+        for (let cardIndex = 0; cardIndex < cards.length; cardIndex++) {
+            this.#cardSlots[cardIndex].setCard(cards[cardIndex]);
+        }
+    }
+
     // ------------------------------------------------------------------------------
     // PRIVATE
     // ------------------------------------------------------------------------------
 
     #cardSlots;
-    #selectedCard;
+    #selectedCardSlot;
 
     #onClick(cardSlot) {
         if(cardSlot.cardIsSelected()) {
             cardSlot.setCardSelected(false);
-            this.#selectedCard = null;
+            this.#selectedCardSlot = null;
         } else {
             cardSlot.setCardSelected(true);
-            if (this.#selectedCard != null) {
-                this.#selectedCard.setCardSelected(false);
+            if (this.#selectedCardSlot != null) {
+                this.#selectedCardSlot.setCardSelected(false);
             }
-            this.#selectedCard = cardSlot;
+            this.#selectedCardSlot = cardSlot;
         }
     }
 

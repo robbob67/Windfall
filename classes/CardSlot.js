@@ -11,19 +11,20 @@ export class CardSlot {
     // PUBLIC
     // ------------------------------------------------------------------------------
 
-    static BLANK_CARD_TEXTURE = new THREE.TextureLoader().load( 'textures/treant.png' );
+    static BLANK_CARD_TEXTURE = new THREE.TextureLoader().load( 'textures/crate.gif' );
     
     constructor() {
         this.#cardIsFocused = false;
         this.#cardIsSelected = false;
         this.#meshes = [];
+        this.#card = null;
     }
     
     addToThreeJSScene(threeJSScene, xPosition, yPosition, zPosition, tiltInRadians, width, height) {
         const size = Math.min(width, height);
         const geometry = new THREE.PlaneGeometry( size, size );
         const material = new THREE.MeshBasicMaterial( { map: CardSlot.BLANK_CARD_TEXTURE } );
-        //var material = new THREE.MeshStandardMaterial( { color: 0x00ff00, flatShading: true, metalness: 0, roughness: 1 });
+        //const material = new THREE.MeshStandardMaterial( { color: 0x00ff00, flatShading: true, metalness: 0, roughness: 1 });
         const cardPlane = new THREE.Mesh( geometry, material );
         this.#meshes.push(cardPlane);
         geometry.translate( xPosition - ((width - size)/2), yPosition - ((height - size)/2), zPosition );
@@ -38,6 +39,22 @@ export class CardSlot {
             }
         }
         return false;
+    }
+
+    setCard(card) {
+        this.#card = card; 
+        const material = new THREE.MeshBasicMaterial( { map: this.#currentTexture() } );
+        this.#performMeshAction((mesh) => {
+            mesh.material = material;
+        });
+    }
+
+    card() {
+        return this.#card;
+    }
+
+    isEmpty() {
+        return this.#card == null;
     }
 
     setCardFocus(isFocused) {
@@ -66,8 +83,7 @@ export class CardSlot {
             this.#cardIsSelected = isSelected;
             if (isSelected) {
                 this.#performMeshAction((mesh) => {
-                    //mesh.material = new THREE.MeshStandardMaterial( { color: 0x00ff00, flatShading: true, metalness: 0, roughness: 1 });
-                    mesh.material = new THREE.MeshBasicMaterial( { color: 0xffffff00 , map: CardSlot.BLANK_CARD_TEXTURE } );
+                    mesh.material = new THREE.MeshBasicMaterial( { color: 0xffffff00 , map: this.#currentTexture() } );
                 });
             } else {
                 this.#performMeshAction((mesh) => {
@@ -84,6 +100,15 @@ export class CardSlot {
     #meshes;
     #cardIsFocused;
     #cardIsSelected;
+    #card;
+
+    #currentTexture() {
+        if(this.#card != null) {
+            return this.#card.texture();
+        } else {
+            return CardSlot.BLANK_CARD_TEXTURE;
+        }
+    }
 
     #performMeshAction(action) {
         for (let i = 0; i < this.#meshes.length; i++) {

@@ -19,8 +19,9 @@ export class Table {
     static tableHeight = 4;
     static tableDepth = 1;
     
-    constructor(numberOfCardSlots) {
+    constructor(gameContext, numberOfCardSlots) {
         this.#cardSlots = [];
+        this.#gameContext = gameContext;
         for (let cardSlotIndex = 0; cardSlotIndex < numberOfCardSlots; cardSlotIndex++) {
             this.#cardSlots.push(new CardSlot());
         }
@@ -42,7 +43,10 @@ export class Table {
         },  (cardSlotMouseLeaved) => {
 
         },  (cardSlotWasClicked) => {
-
+            if (this.#gameContext.hasActiveCard() && cardSlotWasClicked.isEmpty()) {
+                const activeCard = this.#gameContext.popActiveCard();
+                cardSlotWasClicked.setCard(activeCard);
+            }
         });
     }
 
@@ -51,6 +55,7 @@ export class Table {
     // ------------------------------------------------------------------------------
 
     #cardSlots;
+    #gameContext;
 
     #addCardSlotsToThreeJSScene(threeJSScene) {
         const numberOfCardSlots = this.#cardSlots.length;
