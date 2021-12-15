@@ -30,6 +30,5 @@ export class GameContext {
 
     #hasActiveCard;
     #popActiveCard;
-
     
 }

@@ -36,15 +36,12 @@ function main() {
 
     hand.setCardsInHand([new Card(), new Card()]);
     const gameContext = new GameContext(() => {
-        console.log("hand.aSelectedCardExists()");
         return hand.aSelectedCardExists();
     }, () => {
-        console.log("hand.popSelectedCard()");
         return hand.popSelectedCard();
     });
 
     const table = new Table(gameContext, numberOfTableCards);
-    
     gameScene.addTable(table);
 }
 
