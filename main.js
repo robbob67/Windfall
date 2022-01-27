@@ -25,7 +25,7 @@ class Board {
 // MAIN
 // ------------------------------------------------------------------------------
 function main() {
-    const numberOfTableCards = 100;
+    const numberOfTableCards = 64;
     const numberOfHandCards = 5;
 
     const gameScene = new GameScene();
